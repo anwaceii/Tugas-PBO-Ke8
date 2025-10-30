@@ -7,6 +7,8 @@
  *
  * @author MyBook SAGA 12
  */
+import java.text.DecimalFormat;
+
 public class calculator extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(calculator.class.getName());
@@ -18,6 +20,23 @@ public class calculator extends javax.swing.JFrame {
     double secondnum;
     double result;
     String operations;
+    
+    // helper: format hasil (hapus .0 kalau hasilnya bulat)
+private String formatResult(double value) {
+    DecimalFormat df = new DecimalFormat("0.##########");
+    return df.format(value);
+}
+
+// helper: cek apakah angka terakhir sudah mengandung titik
+private boolean lastNumberHasDot(String text) {
+    int i = text.length() - 1;
+    while (i >= 0 && (Character.isDigit(text.charAt(i)) || text.charAt(i) == '.')) {
+        i--;
+    }
+    String last = text.substring(i + 1);
+    return last.contains(".");
+}
+
     
     public calculator() {
         initComponents();
@@ -381,8 +400,11 @@ public class calculator extends javax.swing.JFrame {
 
     private void jButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton15ActionPerformed
         // TODO add your handling code here:
-        String Entername=jxtDisplay.getText()+jButton15.getText();
-       jxtDisplay.setText(Entername);
+        String text = jxtDisplay.getText();
+        if (!lastNumberHasDot(text)) {
+        jxtDisplay.setText(text + ".");
+}
+
     }//GEN-LAST:event_jButton15ActionPerformed
 
     private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
@@ -417,42 +439,54 @@ public class calculator extends javax.swing.JFrame {
 
     private void jButton18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton18ActionPerformed
         // TODO add your handling code here:
-        String anwers;
-        secondnum=Double.parseDouble(jxtDisplay.getText());
-        if(operations=="+")
-        {
-            result=firstnum+secondnum;
-            anwers=String.format("%.0f", result);
-            jxtDisplay.setText(anwers);
+    String text = jxtDisplay.getText();
+    if (text == null || text.isEmpty()) {
+        // tidak ada angka kedua -> tidak lakukan apa-apa
+        return;
+    }
+
+    try {
+        // Ambil secondnum dari display
+        secondnum = Double.parseDouble(text);
+
+        // Hitung sesuai operasi
+        if (operations == null) return;
+
+        switch (operations) {
+            case "+":
+                result = firstnum + secondnum;
+                break;
+            case "-":
+                result = firstnum - secondnum;
+                break;
+            case "*":
+                result = firstnum * secondnum;
+                break;
+            case "/":
+                if (secondnum == 0) {
+                    jxtDisplay.setText("Error: /0");
+                    return;
+                }
+                result = firstnum / secondnum;
+                break;
+            case "%":
+                result = firstnum % secondnum;
+                break;
+            default:
+                return;
         }
-        else if
-            (operations=="-")
-        {
-            result=firstnum-secondnum;
-            anwers=String.format("%.0f", result);
-            jxtDisplay.setText(anwers);
-        }
-        else if
-            (operations=="/")
-        {
-            result=firstnum/secondnum;
-            anwers=String.format("%.0f", result);
-            jxtDisplay.setText(anwers);
-        }
-        else if
-            (operations=="*")
-        {
-            result=firstnum*secondnum;
-            anwers=String.format("%.0f", result);
-            jxtDisplay.setText(anwers);
-        }
-        else if
-            (operations=="%")
-        {
-            result=firstnum%secondnum;
-            anwers=String.format("%.0f", result);
-            jxtDisplay.setText(anwers);
-        }
+
+        // Tampilkan hasil yang terformat (mis. 24.5 atau 2)
+        String answer = formatResult(result);
+        jxtDisplay.setText(answer);
+
+    } catch (NumberFormatException nfe) {
+        jxtDisplay.setText("Error");
+    } catch (Exception ex) {
+        jxtDisplay.setText("Error");
+    }
+
+
         
     }//GEN-LAST:event_jButton18ActionPerformed
 
